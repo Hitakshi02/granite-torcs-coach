@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Granite TORCS Coach — Telemetry Dashboard</title>
+<style>
+  :root {
+    --bg: #0a0a0d;
+    --panel: #151518;
+    --panel-border: #2a2a2f;
+    --red: #e10600;
+    --red-glow: rgba(225, 6, 0, 0.35);
+    --white: #f5f5f5;
+    --muted: #9a9aa2;
+    --green: #2ecc71;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 40px 24px 80px;
+    background:
+      radial-gradient(circle at 20% 0%, rgba(225,6,0,0.08), transparent 40%),
+      radial-gradient(circle at 80% 10%, rgba(225,6,0,0.06), transparent 35%),
+      var(--bg);
+    color: var(--white);
+    font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  header h1 {
+    font-size: 2.6rem;
+    margin: 0;
+    letter-spacing: 1px;
+    text-shadow: 0 0 18px var(--red-glow);
+  }
+
+  header .subtitle {
+    color: var(--muted);
+    margin-top: 8px;
+    font-size: 1rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  header .accent-line {
+    width: 120px;
+    height: 4px;
+    margin: 20px auto 0;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.3rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--white);
+    margin: 56px 0 22px;
+  }
+
+  .section-title::before {
+    content: "";
+    width: 6px;
+    height: 24px;
+    background: var(--red);
+    display: inline-block;
+    border-radius: 2px;
+  }
+
+  .lap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .lap-card {
+    background: linear-gradient(160deg, var(--panel), #0f0f12);
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .lap-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--red);
+  }
+
+  .lap-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px var(--red-glow);
+  }
+
+  .lap-card.best {
+    border-color: var(--red);
+    box-shadow: 0 0 0 1px var(--red), 0 12px 30px var(--red-glow);
+  }
+
+  .lap-card .lap-number {
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--red);
+    font-weight: 700;
+  }
+
+  .lap-card .track-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 6px 0 18px;
+  }
+
+  .lap-card .stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 0;
+    border-top: 1px solid var(--panel-border);
+    font-size: 0.95rem;
+  }
+
+  .lap-card .stat-row:first-of-type {
+    border-top: none;
+  }
+
+  .lap-card .stat-label {
+    color: var(--muted);
+  }
+
+  .lap-card .stat-value {
+    font-weight: 600;
+  }
+
+  .stat-value.damage-high { color: var(--red); }
+  .stat-value.damage-mid { color: #f0a500; }
+  .stat-value.damage-none { color: var(--green); }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .badge.yes {
+    background: rgba(46, 204, 113, 0.15);
+    color: var(--green);
+    border: 1px solid rgba(46, 204, 113, 0.4);
+  }
+
+  .badge.no {
+    background: rgba(225, 6, 0, 0.15);
+    color: #ff6a63;
+    border: 1px solid rgba(225, 6, 0, 0.4);
+  }
+
+  .best-tag {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--red);
+    font-weight: 800;
+  }
+
+  .coach-box {
+    max-width: 900px;
+    margin: 0 auto;
+    background: linear-gradient(160deg, var(--panel), #0f0f12);
+    border: 1px solid var(--panel-border);
+    border-left: 4px solid var(--red);
+    border-radius: 14px;
+    padding: 32px 36px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+
+  .coach-box .coach-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  .coach-box .coach-meta .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+  }
+
+  .coach-block {
+    margin-bottom: 26px;
+  }
+
+  .coach-block:last-child {
+    margin-bottom: 0;
+  }
+
+  .coach-block h3 {
+    margin: 0 0 8px;
+    font-size: 1.05rem;
+    color: var(--red);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  .coach-block p {
+    margin: 0;
+    line-height: 1.6;
+    color: #dcdce0;
+  }
+
+  .config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+  }
+
+  .config-grid .config-item {
+    background: rgba(225, 6, 0, 0.08);
+    border: 1px solid rgba(225, 6, 0, 0.25);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 0.9rem;
+  }
+
+  .config-grid .config-item span {
+    color: var(--muted);
+  }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    margin-top: 60px;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <h1>🏁 Telemetry Dashboard</h1>
+    <div class="subtitle">Granite TORCS Coach — Multi-Lap Comparison</div>
+    <div class="accent-line"></div>
+  </header>
+
+  <div class="section-title">Lap Telemetry</div>
+  <div class="lap-grid">
+
+    <div class="lap-card">
+      <div class="lap-number">Lap 01</div>
+      <div class="track-name">Wheel 1</div>
+      <div class="stat-row">
+        <span class="stat-label">Top Speed</span>
+        <span class="stat-value">98 km/h</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Damage</span>
+        <span class="stat-value damage-high">847</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Completed</span>
+        <span class="badge no">NO</span>
+      </div>
+    </div>
+
+    <div class="lap-card">
+      <div class="lap-number">Lap 02</div>
+      <div class="track-name">Wheel 1</div>
+      <div class="stat-row">
+        <span class="stat-label">Top Speed</span>
+        <span class="stat-value">134 km/h</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Damage</span>
+        <span class="stat-value damage-mid">212</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Completed</span>
+        <span class="badge no">NO</span>
+      </div>
+    </div>
+
+    <div class="lap-card best">
+      <div class="best-tag">★ Best Lap</div>
+      <div class="lap-number">Lap 03</div>
+      <div class="track-name">Forza</div>
+      <div class="stat-row">
+        <span class="stat-label">Top Speed</span>
+        <span class="stat-value">167 km/h</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Damage</span>
+        <span class="stat-value damage-none">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Completed</span>
+        <span class="badge yes">YES</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-title">Granite AI Coaching Output</div>
+  <div class="coach-box">
+    <div class="coach-meta">
+      <span class="dot"></span>
+      ibm-granite/granite-7b-instruct · analysis of 3 laps
+    </div>
+
+    <div class="coach-block">
+      <h3>Best Lap Analysis</h3>
+      <p>Lap 3 was the best lap, as it had the lowest damage and the highest top speed.</p>
+    </div>
+
+    <div class="coach-block">
+      <h3>Trend Identified</h3>
+      <p>Damage decreased from 847 in lap 1 to 0 in lap 3, indicating an improvement in performance.</p>
+    </div>
+
+    <div class="coach-block">
+      <h3>Recommended Lap 4 Configuration</h3>
+      <div class="config-grid">
+        <div class="config-item"><span>target_speed:</span> 160</div>
+        <div class="config-item"><span>steer_gain:</span> 45</div>
+        <div class="config-item"><span>centering_gain:</span> 0.6</div>
+        <div class="config-item"><span>brake_threshold:</span> 0.4</div>
+      </div>
+    </div>
+
+    <div class="coach-block">
+      <h3>Reasoning</h3>
+      <p>The recommended lap 4 configuration is based on the successful lap 3, which had the lowest damage and the highest top speed. Maintaining the same steer gain, centering gain, and brake threshold as lap 3, the target speed is adjusted to 160 to match the lap 2 configuration. This configuration should provide a stable and fast driving experience.</p>
+    </div>
+  </div>
+
+  <footer>Granite TORCS Coach &middot; Powered by IBM Granite via Hugging Face</footer>
+
+</body>
+</html>

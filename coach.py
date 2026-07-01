@@ -14,29 +14,34 @@ API_URL = f"https://router.huggingface.co/featherless-ai/v1/chat/completions"
 OUTPUT_PATH = "results/coaching_output.txt"
 
 with open("telemetry.json", "r") as f:
-    telemetry = json.load(f)
+    laps = json.load(f)
 
-telemetry_str = json.dumps(telemetry, indent=2)
+telemetry_str = json.dumps(laps, indent=2)
 
 system_prompt = """You are an expert AI racing coach for the TORCS racing simulator.
 
-Respond in exactly this structure, and nothing else:
+You will be shown telemetry from multiple laps, side by side. Respond in exactly this structure, and nothing else:
 
-Current Performance Summary
-(2-3 sentences)
+Best Lap Analysis
+(identify which lap performed best and why, 2-3 sentences)
 
-Top 3 Parameter Recommendations
-1. ...
-2. ...
-3. ...
-(each with a specific value to try)
+Trend Identified
+(what changed across the laps and how it affected performance, 2-3 sentences)
 
-One Advanced Suggestion
-(a single concrete next step)
+Recommended Lap 4 Configuration
+target_speed: ...
+steer_gain: ...
+centering_gain: ...
+brake_threshold: ...
 
-Do not add a self-evaluation, confidence score, or any commentary after the Advanced Suggestion."""
+Reasoning
+(explain the reasoning behind each recommended value above)
 
-prompt = f"""A driver has shared their latest lap telemetry data with you. Analyze it carefully.
+When analyzing trends, lower damage values are better. Damage decreased from 847 to 212 to 0 across laps, meaning performance improved. Do not say damage increased when the numbers show it decreased.
+
+Do not add a self-evaluation, confidence score, or any commentary after the Reasoning section."""
+
+prompt = f"""A driver has shared telemetry data from their last {len(laps)} laps, in chronological order. Compare them carefully.
 
 Telemetry data:
 {telemetry_str}"""
@@ -54,7 +59,7 @@ payload = {
     ],
     "max_tokens": 400,
     "temperature": 0.7,
-    "stop": ["Confidence:"],
+    "stop": ["Confidence:", "<|end|>"],
 }
 
 print("Sending telemetry to Granite racing coach...")
