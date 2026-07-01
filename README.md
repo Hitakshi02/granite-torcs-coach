@@ -1,7 +1,7 @@
 # 🏎️ Granite TORCS Coach
 
 ## 🌐 Live Demo
-👉 https://hitakshi02.github.io/granite-torcs-coach
+👉 https://hitakshi02.github.io/granite-torcs-coach/visualizer.html
 
 ## The Problem
 Tuning an autonomous racing AI agent is trial and error — small parameter changes have huge effects and there's no intelligent feedback on what to adjust next.
