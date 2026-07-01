@@ -18,6 +18,17 @@ Tuning an autonomous racing AI agent is trial and error — small parameter chan
 TORCS Simulator → Lap Telemetry (telemetry.json) → coach.py → IBM Granite (granite-7b-instruct) → Coaching Recommendations → visualizer.html Dashboard
 ```
 
+## 📚 Foundation: TORCS Hands-On Lab
+This project is built on top of the IBM SkillsBuild TORCS hands-on lab.
+Lab results and parameter experimentation documented here:
+👉 https://github.com/Hitakshi02/hands-on-labs/tree/main/01_torcs_lab
+
+Key findings from the lab that informed this project:
+- Tested 4 TARGET_SPEED values (100→150→160→80)
+- Discovered track choice dramatically affects agent performance
+- Achieved 0 damage lap on Forza track at 167 km/h
+- These real telemetry results power the Granite coaching pipeline
+
 ## Why This Matters for Racing
 Real racing teams rely on engineers to analyze telemetry and suggest setup changes between sessions. This project brings that same feedback loop to autonomous AI drivers — closing the gap between simulation and intelligent self-improvement.
 
