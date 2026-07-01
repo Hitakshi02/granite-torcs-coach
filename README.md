@@ -1,5 +1,8 @@
 # 🏎️ Granite TORCS Coach
 
+## 🌐 Live Demo
+👉 https://hitakshi02.github.io/granite-torcs-coach
+
 ## The Problem
 Tuning an autonomous racing AI agent is trial and error — small parameter changes have huge effects and there's no intelligent feedback on what to adjust next.
 
@@ -9,6 +12,11 @@ Tuning an autonomous racing AI agent is trial and error — small parameter chan
 - IBM Granite (granite-7b-instruct) via Hugging Face analyzes the telemetry
 - Granite acts as an AI racing coach, giving structured parameter recommendations
 - Output saved to `results/coaching_output.txt` for the next tuning iteration
+
+## 🏗️ Architecture
+```
+TORCS Simulator → Lap Telemetry (telemetry.json) → coach.py → IBM Granite (granite-7b-instruct) → Coaching Recommendations → visualizer.html Dashboard
+```
 
 ## Why This Matters for Racing
 Real racing teams rely on engineers to analyze telemetry and suggest setup changes between sessions. This project brings that same feedback loop to autonomous AI drivers — closing the gap between simulation and intelligent self-improvement.
