@@ -1,0 +1,16 @@
+{
+  "target_speed": 160,
+  "steer_gain": 45,
+  "centering_gain": 0.60,
+  "brake_threshold": 0.4,
+  "track": "Forza",
+  "top_speed_kmh": 167,
+  "damage": 0,
+  "observations": [
+    "Higher speed caused crashes on tight corners",
+    "Forza track completed with 0 damage at 160 target speed",
+    "Lower brake threshold helped before corners",
+    "Small parameter changes had huge effects on behavior"
+  ],
+  "next_idea": "Dynamic speed control that slows automatically in corners"
+}
